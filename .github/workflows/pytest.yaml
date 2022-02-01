@@ -24,7 +24,7 @@ jobs:
     - name: Checkout Repo
       uses: actions/checkout@master
     - name: Setup Python
-      uses: dmitry-shibanov/setup-python@v-dmshib/bump-node-fetch-from-2.6.6-to-2.6.7  # actions/setup-python@main
+      uses: actions/setup-python@9a115684c962a94d8ecfff8c16e21656777b77ea
       with:
         python-version: ${{ matrix.python-version }}
         cache: 'pip'
