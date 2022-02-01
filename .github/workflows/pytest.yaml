@@ -33,6 +33,11 @@ jobs:
       run: |
         python -m pip install --upgrade pip==21.3.1
         pip install -r requirements.txt
+    - name: Setup Python
+      uses: dmitry-shibanov/setup-python@v-dmshib/fix-pip-cache-output
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: 'pip'
     - name: Run Pytest
       run: pytest
 #     - name: Check directory
