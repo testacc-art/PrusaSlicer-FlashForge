@@ -30,9 +30,11 @@ jobs:
         python-version: ${{ matrix.python-version }}
         cache: 'pip'
     - name: Install Pip Dependecies
-      run: pip install -r requirements.txt
+      run: |
+        python -m pip install --upgrade pip==21.3.1
+        pip install -r requirements.txt
     - name: Run Pytest
       run: pytest
-    - name: Check directory
-      shell: bash
-      run: ls -lAR "C:\users\runneradmin\appdata\local\pip"
+#     - name: Check directory
+#       shell: bash
+#       run: ls -lAR "C:\users\runneradmin\appdata\local\pip"
