@@ -10,14 +10,13 @@ on:
   workflow_dispatch:
 
 jobs:
-  pytest:
-    name: Run Tests in ${{ matrix.os }}, python ${{ matrix.python-version }}
+  pytest-python-alpha-with-cache:
+    name: Run Tests in ${{ matrix.os }}, python ${{ matrix.python-version }} with cache
 
     strategy:
       fail-fast: false
       matrix:
         os: [ windows-latest]
-        python-version: ['3.10', '3.11.0-alpha - 3.11']
 
     runs-on: ${{ matrix.os }}
 
@@ -27,8 +26,77 @@ jobs:
     - name: Setup Python
       uses: dmitry-shibanov/setup-python@v-dmshib/fix-pip-cache-output
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: '3.11.0-alpha.4'
         cache: 'pip'
+    - name: Install Pip Dependecies
+      run: |
+        pip install -r requirements.txt
+    - name: Run Pytest
+      run: pytest
+    - name: Spawn without shell
+      run: |
+          pip --version
+          node -e "
+            const { spawn } = require('child_process');
+            const pipCache = spawn('pip', ['cache', 'dir']);
+            pipCache.stdout.on('data', (data) => {
+              console.log('stdout:', data.toString());
+            });
+            pipCache.stderr.on('data', (data) => {
+              console.error('stderr:', data.toString());
+            });
+            pipCache.on('close', (code) => {
+              console.log('child process exited with code', code);
+            });
+            "
+    - name: Spawn with shell
+      run: |
+          pip --version
+          node -e "
+            const { spawn } = require('child_process');
+            const pipCache = spawn('pip', ['cache', 'dir'], {shell: true});
+            pipCache.stdout.on('data', (data) => {
+              console.log('stdout:', data.toString());
+            });
+            pipCache.stderr.on('data', (data) => {
+              console.error('stderr:', data.toString());
+            });
+            pipCache.on('close', (code) => {
+              console.log('child process exited with code', code);
+            });
+            "
+    - name: With exec
+      run: |
+          pip --version
+          node -e "
+            const { exec } = require('child_process');
+
+            exec('pip cache dir', (err, stdout, stderr) => {
+              if(err) {
+                throw err;
+              }
+
+           console.log('stdout:', stdout);
+           console.log('stderr:', stderr);
+          });
+            "
+  pytest-python-with-no-cache:
+    name: Run Tests in ${{ matrix.os }}, python 3.10 with no cache
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ windows-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - name: Checkout Repo
+      uses: actions/checkout@master
+    - name: Setup Python
+      uses: dmitry-shibanov/setup-python@v-dmshib/fix-pip-cache-output
+      with:
+        python-version: '3.10'
     - name: Install Pip Dependecies
       run: |
         pip install -r requirements.txt
