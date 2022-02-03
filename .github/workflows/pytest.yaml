@@ -14,6 +14,7 @@ jobs:
     name: Run Tests in ${{ matrix.os }}, python ${{ matrix.python-version }}
 
     strategy:
+      fail-fast: false
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
         python-version: ['3.10', '3.11.0-alpha - 3.11']
@@ -24,11 +25,59 @@ jobs:
     - name: Checkout Repo
       uses: actions/checkout@master
     - name: Setup Python
-      uses: actions/setup-python@master
+      uses: dmitry-shibanov/setup-python@v-dmshib/fix-pip-cache-output
       with:
         python-version: ${{ matrix.python-version }}
         cache: 'pip'
     - name: Install Pip Dependecies
-      run: pip install -r requirements.txt
+      run: |
+        pip install -r requirements.txt
     - name: Run Pytest
       run: pytest
+    - name: Spawn without shell
+      run: |
+          pip --version
+          node -e "
+            const { spawn } = require('child_process');
+            const pipCache = spawn('pip', ['cache', 'dir']);
+            pipCache.stdout.on('data', (data) => {
+              console.log('stdout:', data.toString());
+            });
+            pipCache.stderr.on('data', (data) => {
+              console.error('stderr:', data.toString());
+            });
+            pipCache.on('close', (code) => {
+              console.log('child process exited with code', code);
+            });
+            "
+    - name: Spawn with shell
+      run: |
+          pip --version
+          node -e "
+            const { spawn } = require('child_process');
+            const pipCache = spawn('pip', ['cache', 'dir'], {shell: true});
+            pipCache.stdout.on('data', (data) => {
+              console.log('stdout:', data.toString());
+            });
+            pipCache.stderr.on('data', (data) => {
+              console.error('stderr:', data.toString());
+            });
+            pipCache.on('close', (code) => {
+              console.log('child process exited with code', code);
+            });
+            "
+    - name: With exec
+      run: |
+          pip --version
+          node -e "
+            const { exec } = require('child_process');
+
+            exec('pip cache dir', (err, stdout, stderr) => {
+              if(err) {
+                throw err;
+              }
+
+           console.log('stdout:', stdout);
+           console.log('stderr:', stderr);
+          });
+            "
