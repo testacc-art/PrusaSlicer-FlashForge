@@ -24,7 +24,7 @@ jobs:
     - name: Checkout Repo
       uses: actions/checkout@master
     - name: Setup Python
-      uses: actions/setup-python@main # master
+      uses: actions/setup-python@156361d073e2d704ec0bfe646b4500cdc0547324 # master
       with:
         python-version: ${{ matrix.python-version }}
         cache: 'pip'
