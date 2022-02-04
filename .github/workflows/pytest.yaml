@@ -28,6 +28,7 @@ jobs:
       with:
         python-version: '3.11.0-alpha.4'
         cache: 'pip'
+        cache-dependency-path: ./flashforge_post_process.py
     - name: Install Pip Dependecies
       run: |
         pip install -r requirements.txt
