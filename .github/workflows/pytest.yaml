@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ windows-latest]
+        os: [ windows-latest, ubuntu-latest, macos-latest]
 
     runs-on: ${{ matrix.os }}
 
@@ -24,7 +24,7 @@ jobs:
     - name: Checkout Repo
       uses: actions/checkout@master
     - name: Setup Python
-      uses: dmitry-shibanov/setup-python@v-dmshib/fix-pip-cache-output
+      uses: dmitry-shibanov/setup-python@v-dmshib/add-fix-for-windows-cache
       with:
         python-version: '3.11.0-alpha.4'
         cache: 'pip'
@@ -95,7 +95,7 @@ jobs:
     - name: Checkout Repo
       uses: actions/checkout@master
     - name: Setup Python
-      uses: dmitry-shibanov/setup-python@v-dmshib/fix-pip-cache-output
+      uses: dmitry-shibanov/setup-python@v-dmshib/add-fix-for-windows-cache
       with:
         python-version: '3.10'
     - name: Install Pip Dependecies
